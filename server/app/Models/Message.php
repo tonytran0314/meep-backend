@@ -9,7 +9,8 @@ class Message extends Model
     protected $fillable = [
         'room_id',
         'user_id',
-        'content'
+        'content',
+        'created_at'
     ];
 
     public function room() {
