@@ -5,5 +5,5 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function() {
-    Route::post('/send-message', [MessageController::class, 'sendMessage']);
+    Route::apiResource('/messages', MessageController::class)->only(['index', 'store']);
 });
