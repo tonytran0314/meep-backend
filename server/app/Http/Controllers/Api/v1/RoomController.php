@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Room;
-use App\Models\User;
+use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
@@ -34,9 +34,17 @@ class RoomController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $roomId)
     {
-        //
+        $user = Auth::user();
+
+        $room = $user->rooms()->where('rooms.id', $roomId)->first();
+
+        if (!$room) {
+            return $this->error(null, 'Unauthorized', 403);
+        }
+
+        return $this->success($room->messages);
     }
 
     /**
