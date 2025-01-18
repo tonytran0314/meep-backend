@@ -9,6 +9,7 @@ use App\Models\Message;
 use App\Traits\HttpResponses;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
 {
@@ -21,8 +22,11 @@ class MessageController extends Controller
 
     public function store(StoreMessageRequest $request) {
         try {
-
-            Message::create($request->all());
+            Message::create([
+                'room_id' => $request->room_id,
+                'user_id' => Auth::user()->id,
+                'content' => $request->content
+            ]);
 
             broadcast(new SendMessage($request->content));
     

@@ -24,16 +24,10 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'room_id' => ['required', 'exists:rooms,id'],
-            'user_id' => [
-                'required',
-                'exists:users,id',
-                Rule::exists('room_user', 'user_id')->where('room_id', $this->room_id),
-                function ($attribute, $value, $fail) {
-                    if ((int)$value !== Auth::id()) {
-                        $fail('Invalid user_id.');
-                    }
-                },
+            'room_id' => [
+                'required', 
+                'exists:rooms,id',
+                Rule::exists('room_user', 'room_id')->where('user_id', Auth::id()),
             ],
             'content' => ['required', 'string', 'max:65535'],
         ];
