@@ -4,6 +4,7 @@ namespace App\Http\Requests\v1;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Auth;
 
 class StoreMessageRequest extends FormRequest
 {
@@ -27,7 +28,12 @@ class StoreMessageRequest extends FormRequest
             'user_id' => [
                 'required',
                 'exists:users,id',
-                Rule::exists('room_user', 'user_id')->where('room_id', $this->room_id)
+                Rule::exists('room_user', 'user_id')->where('room_id', $this->room_id),
+                function ($attribute, $value, $fail) {
+                    if ((int)$value !== Auth::id()) {
+                        $fail('Invalid user_id.');
+                    }
+                },
             ],
             'content' => ['required', 'string', 'max:65535'],
         ];
