@@ -22,13 +22,13 @@ class MessageController extends Controller
 
     public function store(StoreMessageRequest $request) {
         try {
-            Message::create([
+            $message = Message::create([
                 'room_id' => (int) $request->room_id,
                 'user_id' => Auth::user()->id,
                 'content' => $request->content
             ]);
 
-            broadcast(new SendMessage($request->content));
+            broadcast(new SendMessage($message));
     
             return $this->success(null);
 

@@ -2,6 +2,9 @@
 
 use Illuminate\Support\Facades\Broadcast;
 
-Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
+Broadcast::routes(['middleware' => ['api', 'auth:sanctum']]);
+
+Broadcast::channel('room.{roomId}', function ($user, $roomId) {
+    // Ensure user is part of the room
+    return $user->rooms()->where('rooms.id', $roomId)->exists();
 });
