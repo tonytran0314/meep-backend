@@ -9,6 +9,8 @@ use App\Http\Requests\v1\LoginRequest;
 use App\Http\Requests\v1\SignupRequest;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Str;
+use Exception;
 
 class AuthenticationController extends Controller
 {
@@ -38,14 +40,24 @@ class AuthenticationController extends Controller
     }
 
     public function signup(SignupRequest $request) {
-        $record = $request->all();
+        try {
+            $username = strtolower(str_replace(' ', '', $request->name));
+            while (User::where('username', $username)->exists()) {
+                // Append 6 random alphanumeric characters
+                $username = $username . Str::random(6);
+            }
 
-        $newUser = User::create($record);
-
-        if($newUser) {
+            User::create([
+                'name' => $request->name,
+                'username' => $username,
+                'email' => $request->email,
+                'password' => $request->password
+            ]);
+    
             return $this->success(null, 'User created successfully');
-        }
 
-        return $this->error(null, 'Failed to create user', 500);
+        } catch (Exception $error) {
+            return $this->error(null, 'Failed to create user', 500);
+        }
     }
 }
