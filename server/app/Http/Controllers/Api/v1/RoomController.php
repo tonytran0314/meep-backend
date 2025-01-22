@@ -20,7 +20,10 @@ class RoomController extends Controller
     public function index()
     {
         $user = Auth::user();
-        return $this->success(RoomResource::collection($user->rooms));
+        $rooms = $user->rooms()->with(['messages' => function ($query) {
+                                    $query->latest()->limit(1); // Get only the latest message
+                                }])->get();
+        return $this->success(RoomResource::collection($rooms));
     }
 
     /**

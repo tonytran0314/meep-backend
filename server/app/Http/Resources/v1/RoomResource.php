@@ -17,7 +17,12 @@ class RoomResource extends JsonResource
         return [
             'id' => $this->id,
             'avatar' => $this->avatar,
-            'isGroup' => $this->is_group
+            'isGroup' => $this->is_group,
+            'latestMessage' => $this->messages->first() ? [
+                'id' => $this->messages->first()->id,
+                'content' => $this->messages->first()->content,
+                'created_at' => $this->messages->first()->created_at,
+            ] : null,
         ];
     }
 }
