@@ -44,7 +44,9 @@ class RoomController extends Controller
             return $this->error(null, 'Unauthorized', 403);
         }
 
-        return $this->success($room->messages);
+        $messages = $room->messages()->orderBy('created_at', 'desc')->get();
+
+        return $this->success($messages);
     }
 
     /**
