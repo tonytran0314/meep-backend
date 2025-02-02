@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             RoomSeeder::class,
             RoomUserSeeder::class,
+            NotificationTypesSeeder::class,
         ]);
     }
 }
