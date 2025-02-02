@@ -54,4 +54,14 @@ class User extends Authenticatable
     public function rooms() {
         return $this->belongsToMany(Room::class);
     }
+
+    public function sentFriendRequests()
+    {
+        return $this->hasMany(PendingFriend::class, 'sender_id');
+    }
+
+    public function receivedFriendRequests()
+    {
+        return $this->hasMany(PendingFriend::class, 'receiver_id');
+    }
 }

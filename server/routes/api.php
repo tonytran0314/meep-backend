@@ -19,6 +19,8 @@ Route::prefix('v1')->group(function() {
         Route::controller(FriendController::class)->group(function() {
             Route::get('/search-friends', 'search');
             Route::post('/add-friend', 'add');
+            Route::post('/accept-friend', 'accept');
+            Route::post('/reject-friend', 'reject');
             Route::post('/remove-friend', 'remove');
         });
     });
