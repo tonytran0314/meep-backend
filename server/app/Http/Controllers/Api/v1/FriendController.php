@@ -97,8 +97,20 @@ class FriendController extends Controller
     /* -------------------------------------------------------------------------- */
     /*                          Reject add friend request                         */
     /* -------------------------------------------------------------------------- */
-    public function reject() {
+    public function reject(Request $request) {
+        $senderId = (int) $request->senderId;
+        $receiverId = (int) $request->receiverId;
 
+        PendingFriend::where('sender_id', $senderId)
+                    ->where('receiver_id', $receiverId)
+                    ->delete();
+
+        Notification::where('sender_id', $senderId)
+                    ->where('receiver_id', $receiverId)
+                    ->delete();
+
+        $message = 'Removed: sender id = ' . $senderId . ' with receiver id = ' . $receiverId;
+        return $this->success($message);
     }
 
     /* -------------------------------------------------------------------------- */
