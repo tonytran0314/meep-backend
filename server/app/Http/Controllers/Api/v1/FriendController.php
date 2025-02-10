@@ -24,21 +24,35 @@ class FriendController extends Controller
         $myself = Auth::user();
 
         $pendingSenders = PendingFriend::pluck('sender_id')->unique()->toArray();
-
         $pendingReceivers = PendingFriend::whereIn('sender_id', $pendingSenders)
                                          ->orWhereIn('receiver_id', $pendingSenders)
                                          ->pluck('receiver_id')
                                          ->merge($pendingSenders)
                                          ->unique()
                                          ->toArray();
-
+    
+        $roomIds = DB::table('room_user')
+                    ->join('rooms', 'rooms.id', '=', 'room_user.room_id')
+                    ->where('room_user.user_id', $myself->id)
+                    ->where('rooms.is_group', false)
+                    ->pluck('room_user.room_id');
+    
+        $chatFriends = DB::table('room_user')
+                         ->whereIn('room_id', $roomIds)
+                         ->where('user_id', '!=', $myself->id)
+                         ->pluck('user_id')
+                         ->toArray();
+    
         $friends = User::where('username', 'LIKE', "%$username%")
-                        ->where('id', '!=', $myself->id)
-                        ->whereNotIn('id', $pendingReceivers)
-                        ->get();
+                       ->where('id', '!=', $myself->id)
+                       ->whereNotIn('id', $pendingReceivers)
+                       ->whereNotIn('id', $chatFriends)
+                       ->get();
     
         return $this->success($friends);
-    }    
+    }
+    
+    
 
     /* -------------------------------------------------------------------------- */
     /*                           Send add friend request                          */
