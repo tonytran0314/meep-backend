@@ -16,9 +16,9 @@ class NotificationResource extends JsonResource
     {
         return [
             'seen' => $this->seen,
-            'sender_id' => $this->sender_id,
+            'senderId' => $this->sender_id,
             'senderName' => $this->sender->name,
-            'receiver_id' => $this->receiver_id,
+            'receiverId' => $this->receiver_id,
             'type' => $this->type,
             'time' => $this->created_at
         ];
