@@ -23,19 +23,22 @@ class FriendController extends Controller
         $username = $request->query('username');
         $myself = Auth::user();
 
-        // Lấy danh sách receiver_id từ các yêu cầu kết bạn do mình gửi đi
-        $pendingFriendIds = PendingFriend::where('sender_id', $myself->id)
-                                        ->pluck('receiver_id')
-                                        ->toArray();
+        $pendingSenders = PendingFriend::pluck('sender_id')->unique()->toArray();
 
-        // Truy vấn danh sách người dùng, loại bỏ bản thân và những người đang chờ xác nhận kết bạn
+        $pendingReceivers = PendingFriend::whereIn('sender_id', $pendingSenders)
+                                         ->orWhereIn('receiver_id', $pendingSenders)
+                                         ->pluck('receiver_id')
+                                         ->merge($pendingSenders)
+                                         ->unique()
+                                         ->toArray();
+
         $friends = User::where('username', 'LIKE', "%$username%")
                         ->where('id', '!=', $myself->id)
-                        ->whereNotIn('id', $pendingFriendIds)
+                        ->whereNotIn('id', $pendingReceivers)
                         ->get();
-
+    
         return $this->success($friends);
-    }
+    }    
 
     /* -------------------------------------------------------------------------- */
     /*                           Send add friend request                          */
