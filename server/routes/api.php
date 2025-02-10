@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\v1\MessageController;
 use App\Http\Controllers\Api\v1\RoomController;
 use App\Http\Controllers\Api\v1\ProfileController;
 use App\Http\Controllers\Api\v1\FriendController;
+use App\Http\Controllers\Api\v1\NotificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +24,7 @@ Route::prefix('v1')->group(function() {
             Route::post('/reject-friend', 'reject');
             Route::post('/remove-friend', 'remove');
         });
+        Route::get('/notifications', [NotificationController::class, 'index']);
     });
 
     Route::controller(AuthenticationController::class)->group(function() {

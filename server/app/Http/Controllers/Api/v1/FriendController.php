@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Events\v1\NewNotification;
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use App\Models\User;
 use App\Models\PendingFriend;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FriendController extends Controller
 {
@@ -54,7 +57,15 @@ class FriendController extends Controller
             'receiver_id' => $receiverId,
         ]);
 
+        $notification = Notification::create([
+            'seen' => false,
+            'sender_id' => $senderId,
+            'receiver_id' => $receiverId,
+            'type' => 1
+        ]);
+
         // Broadcast the add friend request to the receiver as notification
+        broadcast(new NewNotification($notification));
         
         return $this->success(null);
     }
