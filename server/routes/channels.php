@@ -12,3 +12,7 @@ Broadcast::channel('room.{roomId}', function ($user, $roomId) {
 Broadcast::channel('notification.{userId}', function ($user) {
     return $user !== null;
 });
+
+Broadcast::channel('new-room.{userId}', function ($user) {
+    return $user !== null;
+});

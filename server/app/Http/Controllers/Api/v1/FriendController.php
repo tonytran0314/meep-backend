@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\v1;
 
+use App\Events\v1\NewChatRoom;
 use App\Events\v1\NewNotification;
 use App\Http\Controllers\Controller;
 use App\Models\Notification;
@@ -9,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use App\Models\User;
 use App\Models\PendingFriend;
+use App\Models\Room;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -90,8 +92,27 @@ class FriendController extends Controller
     /* -------------------------------------------------------------------------- */
     /*                          Accept add friend request                         */
     /* -------------------------------------------------------------------------- */
-    public function accept() {
+    public function accept(Request $request) {
+        $senderId = (int) $request->senderId;
+        $receiverId = (int) $request->receiverId;
 
+        $this->deletePendingFriend($senderId, $receiverId);
+        $this->deleteNotification($senderId, $receiverId);
+
+        $newRoom = $this->createNewRoom();
+
+        $this->assignUsersToNewRoom($newRoom->id, $senderId, $receiverId);
+
+        // this function can only create a new notification with type = 2 now. try to make it flexible
+        $newNotification = $this->createNewNotification($senderId, $receiverId);
+
+        broadcast(new NewChatRoom($newRoom, $senderId, $receiverId));
+
+        // this notification would be sent to the person, who sent the add friend request
+        // say that "User abd accepted your add friend request"
+        broadcast(new NewNotification($newNotification));
+
+        return $this->success('Accepted an add friend request');
     }
 
     /* -------------------------------------------------------------------------- */
@@ -101,16 +122,10 @@ class FriendController extends Controller
         $senderId = (int) $request->senderId;
         $receiverId = (int) $request->receiverId;
 
-        PendingFriend::where('sender_id', $senderId)
-                    ->where('receiver_id', $receiverId)
-                    ->delete();
+        $this->deletePendingFriend($senderId, $receiverId);
+        $this->deleteNotification($senderId, $receiverId);
 
-        Notification::where('sender_id', $senderId)
-                    ->where('receiver_id', $receiverId)
-                    ->delete();
-
-        $message = 'Removed: sender id = ' . $senderId . ' with receiver id = ' . $receiverId;
-        return $this->success($message);
+        return $this->success('Rejected an add friend request');
     }
 
     /* -------------------------------------------------------------------------- */
@@ -118,5 +133,51 @@ class FriendController extends Controller
     /* -------------------------------------------------------------------------- */
     public function remove(){
 
+    }
+
+
+    private function createNewRoom() {
+        $newRoom = Room::create([
+            'avatar' => null,
+            'is_group' => 0
+        ]);
+
+        return $newRoom;
+    }
+
+    private function assignUsersToNewRoom($roomId, $senderId, $receiverId) {
+        DB::table('room_user')->insert([
+            [
+                'room_id' => $roomId,
+                'user_id' => $senderId
+            ],
+            [
+                'room_id' => $roomId,
+                'user_id' => $receiverId
+            ]
+        ]);
+    }
+
+    private function deleteNotification($senderId, $receiverId) {
+        Notification::where('sender_id', $senderId)
+                    ->where('receiver_id', $receiverId)
+                    ->delete();
+    }
+
+    private function deletePendingFriend($senderId, $receiverId) {
+        PendingFriend::where('sender_id', $senderId)
+                    ->where('receiver_id', $receiverId)
+                    ->delete();
+    }
+
+    private function createNewNotification($senderId, $receiverId) {
+        $notification = Notification::create([
+            'seen' => false,
+            'sender_id' => $receiverId,
+            'receiver_id' => $senderId,
+            'type' => 2
+        ]);
+
+        return $notification;
     }
 }
