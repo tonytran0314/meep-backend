@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function() {
             Route::post('/remove-friend', 'remove');
         });
         Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/seen-notifications', [NotificationController::class, 'seen']);
     });
 
     Route::controller(AuthenticationController::class)->group(function() {
