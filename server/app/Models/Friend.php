@@ -2,14 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class PendingFriend extends Model
+class Friend extends Model
 {
-    use HasFactory;
-
-    protected $fillable = ['sender_id', 'receiver_id'];
+    protected $fillable = ['sender_id', 'receiver_id', 'status'];
 
     public function sender()
     {

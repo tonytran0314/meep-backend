@@ -9,7 +9,7 @@ use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use App\Models\User;
-use App\Models\PendingFriend;
+use App\Models\Friend;
 use App\Models\Room;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -25,8 +25,8 @@ class FriendController extends Controller
         $username = $request->query('username');
         $myself = Auth::user();
 
-        $pendingSenders = PendingFriend::pluck('sender_id')->unique()->toArray();
-        $pendingReceivers = PendingFriend::whereIn('sender_id', $pendingSenders)
+        $pendingSenders = Friend::pluck('sender_id')->unique()->toArray();
+        $pendingReceivers = Friend::whereIn('sender_id', $pendingSenders)
                                          ->orWhereIn('receiver_id', $pendingSenders)
                                          ->pluck('receiver_id')
                                          ->merge($pendingSenders)
@@ -63,7 +63,7 @@ class FriendController extends Controller
         $senderId = Auth::user()->id;
         $receiverId = (int) $request->userId;
 
-        $exists = PendingFriend::where('sender_id', $senderId)
+        $exists = Friend::where('sender_id', $senderId)
             ->where('receiver_id', $receiverId)
             ->exists();
 
@@ -71,9 +71,10 @@ class FriendController extends Controller
             return $this->error(null, 'Friend request already sent', 400);
         }
 
-        PendingFriend::create([
+        Friend::create([
             'sender_id' => $senderId,
             'receiver_id' => $receiverId,
+            'status' => 'pending'
         ]);
 
         $notification = Notification::create([
@@ -96,7 +97,7 @@ class FriendController extends Controller
         $senderId = (int) $request->senderId;
         $receiverId = (int) $request->receiverId;
 
-        $this->deletePendingFriend($senderId, $receiverId);
+        $this->friendStatusFromPendingToAccepted($senderId, $receiverId);
         $this->deleteNotification($senderId, $receiverId);
 
         $newRoom = $this->createNewRoom();
@@ -165,9 +166,21 @@ class FriendController extends Controller
     }
 
     private function deletePendingFriend($senderId, $receiverId) {
-        PendingFriend::where('sender_id', $senderId)
+        Friend::where('sender_id', $senderId)
                     ->where('receiver_id', $receiverId)
                     ->delete();
+    }
+
+    private function friendStatusFromPendingToAccepted($senderId, $receiverId) {
+        $friend = Friend::where('sender_id', $senderId)
+                        ->where('receiver_id', $receiverId)
+                        ->where('status', 'pending')
+                        ->first();
+        
+        if ($friend) {
+            $friend->status = 'accepted';
+            $friend->save();
+        }
     }
 
     private function createNewNotification($senderId, $receiverId) {
