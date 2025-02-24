@@ -19,6 +19,31 @@ class FriendController extends Controller
     use HttpResponses;
 
     /* -------------------------------------------------------------------------- */
+    /*                                 Friend list                                */
+    /* -------------------------------------------------------------------------- */
+    public function index() {
+        $userId = Auth::user()->id;
+
+        $friendIds = Friend::where(function ($query) use ($userId) {
+                        $query->where('sender_id', $userId);
+                        $query->orWhere('receiver_id', $userId);
+                    }) 
+                    ->where('status', 'accepted')
+                    ->get()
+                    ->map(function ($record) use ($userId) {
+                        return $record->sender_id === $userId ? $record->receiver_id : $record->sender_id;
+                    })
+                    ->unique()
+                    ->values();
+        
+        $friends = User::whereIn('id', $friendIds)->get();
+
+        return $this->success($friends);
+    }
+
+
+
+    /* -------------------------------------------------------------------------- */
     /*                               Search friends                               */
     /* -------------------------------------------------------------------------- */
     public function search(Request $request) {

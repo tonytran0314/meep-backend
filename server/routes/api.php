@@ -18,6 +18,7 @@ Route::prefix('v1')->group(function() {
             Route::put('/profile', 'update');
         });
         Route::controller(FriendController::class)->group(function() {
+            Route::get('/list-friends', 'index');
             Route::get('/search-friends', 'search');
             Route::post('/add-friend', 'add');
             Route::post('/accept-friend', 'accept');
