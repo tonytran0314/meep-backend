@@ -24,7 +24,7 @@ class GroupController extends Controller
         try {
             $groupCreatorId = Auth::user()->id;
             
-            $newGroup = $this->createNewGroup();
+            $newGroup = $this->createNewGroup($request->name);
             
             // Retrieve memberIds as an array
             $memberIds = $request->input('memberIds', []); 
@@ -36,8 +36,6 @@ class GroupController extends Controller
 
             // Add group creator to the members
             $memberIds[] = $groupCreatorId;
-
-            // !!! the group name is currently not using !!!
 
             $this->addUsersToGroup($newGroup->id, $memberIds);
 
@@ -59,10 +57,11 @@ class GroupController extends Controller
         //
     }
 
-    private function createNewGroup() {
+    private function createNewGroup($groupName) {
         $newRoom = Room::create([
             'avatar' => null,
             'is_group' => true,
+            'name' => $groupName
         ]);
 
         return $newRoom;

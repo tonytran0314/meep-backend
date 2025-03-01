@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('avatar')->nullable();
             $table->boolean('is_group')->default(false);
+            $table->string('name')->nullable();
             $table->timestamps();
         });
     }

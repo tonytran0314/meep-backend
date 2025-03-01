@@ -11,7 +11,8 @@ class Room extends Model
 
     protected $fillable = [
         'avatar',
-        'is_group'
+        'is_group',
+        'name'
     ];
 
     public function messages() {

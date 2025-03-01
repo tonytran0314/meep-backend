@@ -49,7 +49,20 @@ class RoomController extends Controller
 
         $messages = $room->messages()->orderBy('created_at', 'desc')->get();
 
-        return $this->success($messages);
+        $name = $room->name;
+
+        if(!$room->is_group) {
+            $room = Room::find($roomId);
+            $otherUser = $room->users->where('id', '!=', $user->id)->first();
+
+            $name = $otherUser ? $otherUser->name : null;
+        }
+
+        return $this->success([
+            'name' => $name,
+            'isGroup' => $room->is_group,
+            'messages' => $messages
+        ]);
     }
 
     /**
