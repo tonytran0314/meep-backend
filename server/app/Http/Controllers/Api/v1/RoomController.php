@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\v1\RoomResource;
+use App\Http\Resources\v1\UserResource;
 
 class RoomController extends Controller
 {
@@ -40,6 +41,7 @@ class RoomController extends Controller
     public function show(string $roomId)
     {
         $user = Auth::user();
+        $members = null;
 
         $room = $user->rooms()->where('rooms.id', $roomId)->first();
 
@@ -56,11 +58,17 @@ class RoomController extends Controller
             $otherUser = $room->users->where('id', '!=', $user->id)->first();
 
             $name = $otherUser ? $otherUser->name : null;
+        } 
+        
+        if($room->is_group) {
+            $room = Room::find($roomId);
+            $members = UserResource::collection($room->users);
         }
 
         return $this->success([
             'name' => $name,
             'isGroup' => $room->is_group,
+            'members' => $members,
             'messages' => $messages
         ]);
     }
