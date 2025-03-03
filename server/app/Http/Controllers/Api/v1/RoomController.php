@@ -66,6 +66,7 @@ class RoomController extends Controller
         }
 
         return $this->success([
+            'id' => $room->id,
             'name' => $name,
             'isGroup' => $room->is_group,
             'members' => $members,
