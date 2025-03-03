@@ -52,9 +52,24 @@ class GroupController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, string $roomId)
     {
-        //
+        try {
+            $group = Room::find($roomId);
+            $memberIds = $request->input('newMemberIds', []); 
+
+            if (!is_array($memberIds)) {
+                $memberIds = [];
+            }
+    
+            $this->addUsersToGroup($roomId, $request->newMemberIds);
+
+            broadcast(new NewGroupChat($group, $memberIds));
+
+            return $this->success(null);
+        } catch (Exception $error) {
+            return $this->error(null, 'Failed to add members', 500);
+        }
     }
 
     private function createNewGroup($groupName) {
