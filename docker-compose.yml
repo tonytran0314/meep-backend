@@ -54,6 +54,5 @@ services:
       - './server:/var/www/html'
     working_dir: /var/www/html
     depends_on:
-      - nginx
       - mysql
       - php
