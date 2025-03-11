@@ -9,6 +9,7 @@ services:
     depends_on:
       - php
       - mysql
+      - reverb
   mysql:
     image: mysql
     restart: unless-stopped
@@ -42,3 +43,17 @@ services:
     working_dir: /var/www/html
     entrypoint:
       - npm
+  reverb:
+    build:
+      context: .
+      dockerfile: reverb/Dockerfile
+    container_name: reverb
+    ports:
+      - '8080:8080'
+    volumes:
+      - './server:/var/www/html'
+    working_dir: /var/www/html
+    depends_on:
+      - nginx
+      - mysql
+      - php
