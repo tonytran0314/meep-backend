@@ -47,7 +47,6 @@ services:
     build:
       context: .
       dockerfile: reverb/Dockerfile
-    container_name: reverb
     ports:
       - '8080:8080'
     volumes:
