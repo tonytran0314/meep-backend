@@ -33,7 +33,7 @@ class MessageController extends Controller
             return $this->success(null);
 
         } catch (Exception $error) {
-            return $this->error(null, 'Failed to send message', 500);
+            return $this->error(null, 'Failed to send message: ' . $error, 500);
         }
     }
 }
