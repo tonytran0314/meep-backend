@@ -54,3 +54,10 @@ services:
     working_dir: /var/www/html
     depends_on:
       - mysql
+    environment:
+      MYSQL_DATABASE: meep_db
+      MYSQL_USER: homestead
+      MYSQL_PASSWORD: homestead
+      MYSQL_ROOT_PASSWORD: secret
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
