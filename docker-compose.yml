@@ -9,7 +9,7 @@ services:
     depends_on:
       - php
       - mysql
-      - reverb
+      # - reverb
   mysql:
     image: mysql
     restart: unless-stopped
