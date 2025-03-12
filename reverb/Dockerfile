@@ -3,8 +3,7 @@ FROM php:8.3-fpm-alpine
 WORKDIR /var/www/html
 
 RUN docker-php-ext-configure pcntl --enable-pcntl \
-  && docker-php-ext-install \
-    pcntl
+  && docker-php-ext-install pcntl pdo pdo_mysql
 
 EXPOSE 8080
 
