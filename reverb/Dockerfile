@@ -8,4 +8,4 @@ RUN docker-php-ext-configure pcntl --enable-pcntl \
 
 EXPOSE 8080
 
-CMD [ "php", "artisan", "reverb:start", "--host=0.0.0.0" ]
+# CMD [ "php", "artisan", "reverb:start", "--host=0.0.0.0" ]
