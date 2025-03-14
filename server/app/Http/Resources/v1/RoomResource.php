@@ -3,8 +3,8 @@
 namespace App\Http\Resources\v1;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class RoomResource extends JsonResource
 {
@@ -25,7 +25,9 @@ class RoomResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'avatar' => $this->avatar,
+            'avatar' => $this->is_group 
+                ? ($this->avatar ? asset('storage/' . $this->avatar) : null) 
+                : ($otherUser?->avatar ? asset('storage/' . $otherUser->avatar) : null),
             'isGroup' => $this->is_group,
             'name' => $this->is_group ? $this->name : ($otherUser?->name ?? 'Unknown'),
             'latestMessage' => $this->messages->first() ? [

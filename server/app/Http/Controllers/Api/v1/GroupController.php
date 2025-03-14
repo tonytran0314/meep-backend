@@ -73,8 +73,9 @@ class GroupController extends Controller
     }
 
     private function createNewGroup($groupName) {
+        $defaultGroupAvatar = 'meepx_default_group_avatar.jpg';
         $newRoom = Room::create([
-            'avatar' => null,
+            'avatar' => $defaultGroupAvatar,
             'is_group' => true,
             'name' => $groupName
         ]);

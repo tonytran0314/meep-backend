@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('rooms', function (Blueprint $table) {
             $table->id();
-            $table->string('avatar')->nullable();
+            $table->string('avatar')->nullable()->default('meepx_default_group_avatar.jpg');
             $table->boolean('is_group')->default(false);
             $table->string('name')->nullable();
             $table->timestamps();

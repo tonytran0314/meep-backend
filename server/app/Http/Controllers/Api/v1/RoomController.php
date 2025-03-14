@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Api\v1;
 
-use App\Http\Controllers\Controller;
 use App\Models\Room;
-use App\Models\Message;
 use Illuminate\Http\Request;
 use App\Traits\HttpResponses;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 use App\Http\Resources\v1\RoomResource;
 use App\Http\Resources\v1\UserResource;
 
@@ -58,11 +57,13 @@ class RoomController extends Controller
             $otherUser = $room->users->where('id', '!=', $user->id)->first();
 
             $name = $otherUser ? $otherUser->name : null;
+            $avatar = $otherUser ? asset('storage/' . $otherUser->avatar) : null; 
         } 
         
         if($room->is_group) {
             $room = Room::find($roomId);
             $members = UserResource::collection($room->users);
+            $avatar = ($room->avatar !== null) ? asset('storage/' . $room->avatar) : null;
         }
 
         return $this->success([
@@ -70,7 +71,8 @@ class RoomController extends Controller
             'name' => $name,
             'isGroup' => $room->is_group,
             'members' => $members,
-            'messages' => $messages
+            'messages' => $messages,
+            'avatar' => $avatar
         ]);
     }
 
