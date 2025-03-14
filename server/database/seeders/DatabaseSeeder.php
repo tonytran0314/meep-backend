@@ -19,6 +19,8 @@ class DatabaseSeeder extends Seeder
             RoomSeeder::class,
             RoomUserSeeder::class,
             NotificationTypesSeeder::class,
+            FriendSeeder::class,
+            MessageSeeder::class,
         ]);
     }
 }

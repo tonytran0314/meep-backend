@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\Room;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\Seeder;
 
 class RoomUserSeeder extends Seeder
@@ -14,13 +15,20 @@ class RoomUserSeeder extends Seeder
      */
     public function run(): void
     {
-        $room1 = Room::find(1);
-        $room1->users()->attach([2, 3]);
+        $jsonData = File::get(database_path('data/room_user.json'));
+        $rooms = json_decode($jsonData, true);
 
-        $room2 = Room::find(2);
-        $room2->users()->attach([4, 7]);
+        foreach ($rooms as $room) {
+            $roomId = $room['room_id'];
+            $userIds = $room['user_ids'];
 
-        $room3 = Room::find(3);
-        $room3->users()->attach([1, 3]);
+            $roomInstance = Room::find($roomId);
+
+            if ($roomInstance) {
+                $roomInstance->users()->attach($userIds);
+            }
+        }
+
+        $this->command->info('RoomUserSeeder completed!');
     }
 }

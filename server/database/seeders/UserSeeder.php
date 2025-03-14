@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\File;
 use Illuminate\Database\Seeder;
 use App\Models\User;
 
@@ -13,64 +14,23 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->create([
-            'name' => 'Test User 1',
-            'username' => 'testuser1',
-            'email' => 'test1@example.com',
-        ]);
+        $jsonPath = database_path('data/users.json');
+        if (!File::exists($jsonPath)) {
+            $this->command->error("Error: users.json file not found!");
+            return;
+        }
 
-        User::factory()->create([
-            'name' => 'Test User 2',
-            'username' => 'testuser2',
-            'email' => 'test2@example.com',
-        ]);
+        $jsonData = File::get($jsonPath);
+        $users = json_decode($jsonData, true);
 
-        User::factory()->create([
-            'name' => 'Test User 3',
-            'username' => 'testuser3',
-            'email' => 'test3@example.com',
-        ]);
+        foreach ($users as $user) {
+            User::factory()->create([
+                'name' => $user['name'],
+                'username' => $user['username'],
+                'email' => $user['email'],
+            ]);
+        }
 
-        User::factory()->create([
-            'name' => 'Test User 4',
-            'username' => 'testuser4',
-            'email' => 'test4@example.com',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Test User 5',
-            'username' => 'testuser5',
-            'email' => 'test5@example.com',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Test User 6',
-            'username' => 'testuser6',
-            'email' => 'test6@example.com',
-        ]);
-        
-        User::factory()->create([
-            'name' => 'Test User 7',
-            'username' => 'testuser7',
-            'email' => 'test7@example.com',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Test User 8',
-            'username' => 'testuser8',
-            'email' => 'test8@example.com',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Test User 9',
-            'username' => 'testuser9',
-            'email' => 'test9@example.com',
-        ]);
-
-        User::factory()->create([
-            'name' => 'Test User 10',
-            'username' => 'testuser10',
-            'email' => 'test10@example.com',
-        ]);
+        $this->command->info('Users seeded successfully!');
     }
 }
