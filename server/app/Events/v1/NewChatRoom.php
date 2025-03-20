@@ -15,18 +15,16 @@ class NewChatRoom implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $room;
-    public $senderId;
-    public $receiverId;
+    private $room;
+    private $userIdThatReceiveThisEvent;
 
     /**
      * Create a new event instance.
      */
-    public function __construct($room, $senderId, $receiverId)
+    public function __construct($room, $userIdThatReceiveThisEvent)
     {
         $this->room = $room;
-        $this->senderId = $senderId;
-        $this->receiverId = $receiverId;
+        $this->userIdThatReceiveThisEvent = $userIdThatReceiveThisEvent;
     }
 
     /**
@@ -37,8 +35,7 @@ class NewChatRoom implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('new-room.' . $this->receiverId),
-            new PrivateChannel('new-room.' . $this->senderId)
+            new PrivateChannel('new-room.' . $this->userIdThatReceiveThisEvent),
         ];
     }
 
@@ -49,8 +46,16 @@ class NewChatRoom implements ShouldBroadcast
 
     public function broadcastWith(): array
     {
+        $otherUser = $this->room->users->where('id', '!=', $this->userIdThatReceiveThisEvent)->first();
+
         return [
-            'room' => new RoomResource($this->room)
+            'room' => [
+                'id' => $this->room->id,
+                'avatar' => asset('storage/' . $otherUser->avatar),
+                'isGroup' => false,
+                'name' => $otherUser->name,
+                'latestMessage' => null
+            ]
         ];
     
     }

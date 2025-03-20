@@ -132,7 +132,8 @@ class FriendController extends Controller
         // this function can only create a new notification with type = 2 now. try to make it flexible
         $newNotification = $this->createNewNotification($senderId, $receiverId);
 
-        broadcast(new NewChatRoom($newRoom, $senderId, $receiverId));
+        broadcast(new NewChatRoom($newRoom, $senderId)); // for the person who sent the friend request
+        broadcast(new NewChatRoom($newRoom, $receiverId)); // for the person who received the friend request
 
         // this notification would be sent to the person, who sent the add friend request
         // say that "User abd accepted your add friend request"
